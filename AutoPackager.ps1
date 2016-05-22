@@ -87,5 +87,27 @@ Function Get-EphingClientApplication {
 }
 
 Function Get-EphingOptions {
-    
+    if ( Test-Path "$PSScriptRoot\Settings.ini" ) {
+        try {
+            $Settings = Get-Content "$PSScriptRoot\Settings.ini"
+            $SettingsHash = @{}
+            Foreach($line in $Settings) {
+                if ($line.contains('=')) {
+                    $SplitLine = $line.Split('=')
+                    $SettingsHash[$SplitLine[0].Trim()] = $SplitLine[1].Trim()
+                }
+            }
+            return $SettingsHash
+        }
+        catch {
+            Write-EphingLog -Message 'Can not load settings'
+            Exit
+        }
+    }
+    else {
+        Write-EphingLog -Message 'Can not load settings'
+        Exit
+    }
 }
+
+$Settings = Get-EphingOptions
